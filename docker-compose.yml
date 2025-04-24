@@ -1,0 +1,75 @@
+services:
+  mysql:
+    image: mysql:8.3.0
+    container_name: fabric-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fabric
+      MYSQL_USER: fabric
+      MYSQL_PASSWORD: fabric
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+      - ./sql.cnf:/etc/mysql/conf.d/sql.cnf
+    networks:
+      - fabric-net
+
+  redpanda:
+    image: redpandadata/redpanda:latest
+    container_name: redpanda
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - "1G"
+      - --reserve-memory
+      - "0M"
+      - --node-id
+      - "0"
+      - --check=false
+      - --advertise-kafka-addr
+      - "redpanda:9092"
+    ports:
+      - "9092:9092"
+      - "9644:9644"
+    networks:
+      - fabric-net
+
+  connect:
+    image: debezium/connect:2.5
+    container_name: debezium-connect
+    depends_on:
+      - mysql
+      - redpanda
+    environment:
+      BOOTSTRAP_SERVERS: redpanda:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect-configs
+      OFFSET_STORAGE_TOPIC: connect-offsets
+      STATUS_STORAGE_TOPIC: connect-status
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      STATUS_STORAGE_REPLICATION_FACTOR: 1
+    ports:
+      - "8083:8083"
+    networks:
+      - fabric-net
+
+  fabric-app:
+    build:
+      context: .
+    depends_on:
+      - redpanda
+      - mysql
+      - connect
+    networks:
+      - fabric-net
+
+networks:
+  fabric-net:

@@ -1,0 +1,22 @@
+{
+  "name": "mysql-fabric-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "database.hostname": "mysql",
+    "database.port": "3306",
+    "database.user": "fabric",
+    "database.password": "fabric",
+    "database.server.id": "184054",
+    "database.server.name": "dbserver1",
+    "database.include.list": "fabric",
+    "table.include.list": "fabric.doctors,fabric.practices,fabric.practice_doctors,fabric.practice_branches,fabric.practice_locations,fabric.practice_services,fabric.practice_timings,fabric.specializations,fabric.doctor_specializations",
+
+    "schema.history.internal.kafka.bootstrap.servers": "redpanda:9092",
+    "schema.history.internal.kafka.topic": "schema-changes.fabric",
+
+    "include.schema.changes": "true",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "topic.prefix": "dbserver1"
+  }
+}
