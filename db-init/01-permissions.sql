@@ -1,0 +1,3 @@
+-- Grant necessary permissions for Debezium
+GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT, SUPER ON *.* TO 'fabric'@'%';
+FLUSH PRIVILEGES;
