@@ -24,7 +24,6 @@ Follow the steps below to set up and run the application locally.
 
 - Install Colima and Qemu using brew
 - ```brew install colima```
-\n
 - ```brew install qemu```
 - ```brew install docker```
 - [Docker Compose](https://docs.docker.com/compose/install/)
